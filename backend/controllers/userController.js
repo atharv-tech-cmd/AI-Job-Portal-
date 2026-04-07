@@ -3,7 +3,7 @@ import { sendEmail } from "../utils/sendEmail.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// SIGNUP LOGIC
+
 export const register = async (req, res) => {
     try {
         const { fullname, email, password, role } = req.body;
@@ -33,7 +33,7 @@ export const register = async (req, res) => {
     }
 };
 
-// LOGIN LOGIC
+
 export const login = async (req, res) => {
     try {
         const { email, password, role } = req.body;
@@ -52,12 +52,12 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: "Incorrect email or password.", success: false });
         }
 
-        // Check assigned role
+    
         if (role !== user.role) {
             return res.status(400).json({ message: "Account doesn't exist with current role.", success: false });
         }
 
-        // Generate Token
+        
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         return res.status(200).cookie("token", token, {
@@ -76,7 +76,7 @@ export const login = async (req, res) => {
     }
 };
 
-// LOGOUT LOGIC
+
 export const logout = async (req, res) => {
     try {
         return res.status(200).cookie("token", "", { maxAge: 0 }).json({
@@ -89,7 +89,6 @@ export const logout = async (req, res) => {
     }
 };
 
-// UPDATE PROFILE LOGIC (FIXED)
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, bio, skills } = req.body;
@@ -107,7 +106,7 @@ export const updateProfile = async (req, res) => {
             return res.status(400).json({ message: "User not found.", success: false });
         }
 
-        // Yahan par humne "profile" na hone ka Fix add kar diya hai
+        
         if (!user.profile) {
             user.profile = {};
         }
@@ -138,7 +137,7 @@ export const updateProfile = async (req, res) => {
     }
 }
 
-// FORGOT PASSWORD LOGIC
+
 export const forgotPassword = async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
@@ -174,7 +173,7 @@ export const forgotPassword = async (req, res) => {
     }
 };
 
-// RESET PASSWORD LOGIC
+
 export const resetPassword = async (req, res) => {
     try {
         const { otp, newPassword } = req.body;
