@@ -12,6 +12,7 @@ import ResetPassword from './components/ResetPassword';
 import AIAnalyzer from './components/AIAnalyzer';
 import AdminDashboard from './components/AdminDashboard';
 import FindJobs from './components/FindJobs';
+import VerifyEmail from './components/VerifyEmail';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Routes>
          <Route path="/" element={<Signup />} />
          <Route path="/login" element={<Login />} />
+         <Route path="/verify-email" element={<VerifyEmail />} />
          <Route path="/home" element={<Home />} />
          <Route path="/post-job" element={<PostJob />} />
          <Route path="/profile" element={<Profile />} />

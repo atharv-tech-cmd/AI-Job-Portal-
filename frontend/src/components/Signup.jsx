@@ -13,6 +13,7 @@ function Signup() {
     });
 
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
@@ -29,7 +30,7 @@ function Signup() {
 
             if (res.data.success) {
                 toast.success(res.data.message);
-                navigate("/login");
+                navigate("/verify-email", { state: { email: input.email } });
             }
         } catch (error) {
             console.log(error);
@@ -91,9 +92,18 @@ function Signup() {
                         
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-1.5">Password</label>
-                            <input type="password" name="password" value={input.password} onChange={changeEventHandler} 
-                                   className="block w-full rounded-xl border border-gray-300 px-4 py-3.5 text-gray-900 focus:border-blue-600 focus:ring-blue-600 focus:ring-1 outline-none transition shadow-sm bg-gray-50" 
-                                   placeholder="••••••••" required />
+                            <div className="relative">
+                                <input type={showPassword ? "text" : "password"} name="password" value={input.password} onChange={changeEventHandler} 
+                                       className="block w-full rounded-xl border border-gray-300 px-4 py-3.5 pr-10 text-gray-900 focus:border-blue-600 focus:ring-blue-600 focus:ring-1 outline-none transition shadow-sm bg-gray-50" 
+                                       placeholder="••••••••" required />
+                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
+                                    {showPassword ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.579 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                                    )}
+                                </button>
+                            </div>
                         </div>
 
                         <div>

@@ -12,7 +12,10 @@ const userSchema = new mongoose.Schema({
         profilePhoto: { type: String, default: "" }
     },
     resetPasswordOTP: { type: String },
-    resetPasswordExpires: { type: Date }
+    resetPasswordExpires: { type: Date },
+    isVerified: { type: Boolean, default: false },
+    verificationOTP: { type: String },
+    verificationOTPExpires: { type: Date }
 }, {timestamps: true});
 
 export const User = mongoose.model("User", userSchema);
