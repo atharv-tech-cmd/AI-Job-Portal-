@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 function FindJobs() {
     const [jobs, setJobs] = useState([]);
@@ -7,17 +8,41 @@ function FindJobs() {
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        const fetchExternalJobs = async () => {
+        const fetchJobs = async () => {
             try {
-                const res = await axios.get("https://remotive.com/api/remote-jobs?limit=30");
-                setJobs(res.data.jobs);
+                // Fetch external jobs
+                const externalRes = await axios.get("https://remotive.com/api/remote-jobs?limit=30");
+                const externalJobs = externalRes.data.jobs || [];
+
+                // Fetch local jobs hosted on our backend
+                let localJobs = [];
+                try {
+                    const localRes = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/job/get");
+                    if (localRes.data.success) {
+                        localJobs = localRes.data.jobs.map(job => ({
+                            id: job._id,
+                            title: job.title,
+                            company_name: job.companyName || "Local Employer",
+                            company_logo: "https://via.placeholder.com/100?text=Local",
+                            category: job.jobType || "General",
+                            candidate_required_location: job.location || "Remote",
+                            url: "#", // Local job doesn't have an external apply link yet
+                            isLocal: true,
+                            jobId: job._id
+                        }));
+                    }
+                } catch (e) {
+                    console.log("Failed to fetch local jobs", e);
+                }
+
+                setJobs([...localJobs, ...externalJobs]);
             } catch (error) {
-                console.log("Failed to fetch global jobs", error);
+                console.log("Failed to fetch jobs", error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchExternalJobs();
+        fetchJobs();
     }, []);
 
     const filteredJobs = jobs.filter(job => 
@@ -25,12 +50,28 @@ function FindJobs() {
         job.company_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const handleApply = async (e, job) => {
+        if (job.isLocal) {
+            e.preventDefault();
+            try {
+                const res = await axios.post(`https://ai-job-portal-glq9.onrender.com/api/v1/application/apply/${job.jobId}`, {}, {
+                    withCredentials: true
+                });
+                if (res.data.success) {
+                    toast.success(res.data.message || `Successfully applied to ${job.title}!`);
+                }
+            } catch (error) {
+                toast.error(error.response?.data?.message || "Failed to apply");
+            }
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10 px-4">
             <div className="w-full max-w-6xl mb-10 text-center">
                 <h1 className="text-4xl md:text-5xl font-black mb-4 text-gray-900">Discover Real <span className="text-blue-600">Global Jobs</span></h1>
                 <p className="text-gray-500 text-lg mb-8 max-w-2xl mx-auto font-medium">
-                    Live job openings fetched directly from external global remote portals. Search by role, company, or keyword.
+                    Live job openings fetched directly from external global remote portals & Local Recruiters. Search by role, company, or keyword.
                 </p>
                 <div className="max-w-2xl mx-auto relative">
                     <input 
@@ -47,7 +88,7 @@ function FindJobs() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center mt-20">
                     <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4 shadow-xl"></div>
-                    <p className="text-xl text-blue-600 font-bold animate-pulse">Scraping global job boards...</p>
+                    <p className="text-xl text-blue-600 font-bold animate-pulse">Scraping job boards...</p>
                 </div>
             ) : (
                 <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -69,7 +110,13 @@ function FindJobs() {
                                 </div>
                             </div>
                             
-                            <a href={job.url} target="_blank" rel="noreferrer" className="block w-full text-center bg-gray-900 text-white font-bold py-3.5 rounded-xl hover:bg-blue-600 transition shadow-lg">
+                            <a 
+                                href={job.url} 
+                                target={job.isLocal ? "_self" : "_blank"} 
+                                rel="noreferrer" 
+                                onClick={(e) => handleApply(e, job)}
+                                className="block w-full text-center bg-gray-900 text-white font-bold py-3.5 rounded-xl hover:bg-blue-600 transition shadow-lg"
+                            >
                                 Apply Directly 🚀
                             </a>
                         </div>

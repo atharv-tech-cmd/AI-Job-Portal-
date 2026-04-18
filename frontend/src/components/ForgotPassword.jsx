@@ -10,7 +10,7 @@ function ForgotPassword() {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("http://localhost:8000/api/v1/user/forgot-password", { email }, {
+            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/forgot-password", { email }, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
