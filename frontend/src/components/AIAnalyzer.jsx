@@ -11,7 +11,7 @@ function AIAnalyzer() {
     const analyzeResumeHandler = async () => {
         setLoading(true);
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/user/ai-analyze", {
+            const res = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/user/ai-analyze", {
                 withCredentials: true
             });
             if (res.data.success) {
@@ -29,7 +29,7 @@ function AIAnalyzer() {
     const generateResumeHandler = async () => {
         setGeneratingResume(true);
         try {
-            const res = await axios.get("http://localhost:8000/api/v1/user/ai-generate-resume", {
+            const res = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/user/ai-generate-resume", {
                 withCredentials: true
             });
             if (res.data.success) {

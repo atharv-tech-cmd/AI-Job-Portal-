@@ -17,7 +17,7 @@ function FindJobs() {
                 // Fetch local jobs hosted on our backend
                 let localJobs = [];
                 try {
-                    const localRes = await axios.get("http://localhost:8000/api/v1/job/get");
+                    const localRes = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/job/get");
                     if (localRes.data.success) {
                         localJobs = localRes.data.jobs.map(job => ({
                             id: job._id,
@@ -54,7 +54,7 @@ function FindJobs() {
         if (job.isLocal) {
             e.preventDefault();
             try {
-                const res = await axios.post(`http://localhost:8000/api/v1/application/apply/${job.jobId}`, {}, {
+                const res = await axios.post(`https://ai-job-portal-glq9.onrender.com/api/v1/application/apply/${job.jobId}`, {}, {
                     withCredentials: true
                 });
                 if (res.data.success) {

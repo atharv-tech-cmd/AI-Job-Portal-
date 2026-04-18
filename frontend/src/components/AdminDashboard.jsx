@@ -8,7 +8,7 @@ function AdminDashboard() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/v1/user/admin/stats", {
+                const res = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/user/admin/stats", {
                     withCredentials: true
                 });
                 if (res.data.success) {
