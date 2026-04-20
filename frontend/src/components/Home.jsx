@@ -15,7 +15,11 @@ function Home() {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        navigate(`/find-jobs?role=${search.role}&location=${search.location}`);
+        // Dynamic search navigation
+        const params = new URLSearchParams();
+        if (search.role) params.append('role', search.role);
+        if (search.location) params.append('location', search.location);
+        navigate(`/find-jobs?${params.toString()}`);
     };
 
     const categories = [
@@ -28,26 +32,26 @@ function Home() {
     ];
 
     return (
-        <main className="min-h-screen bg-[#f8f9ff] dark:bg-gray-950 text-gray-900 dark:text-white transition-colors">
+        <main className="min-h-screen bg-[var(--bg-secondary)] transition-colors duration-300">
             
             {/* Hero Section - Naukri Style */}
-            <div className="bg-white dark:bg-gray-900 pt-20 pb-20 shadow-sm">
+            <div className="bg-[var(--bg-primary)] pt-20 pb-20 shadow-sm border-b border-[var(--border-color)]">
                 <div className="max-w-6xl mx-auto px-6 text-center">
-                    <h1 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">
+                    <h1 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-[var(--text-primary)]">
                         Find your dream job <span className="text-blue-600">now</span>
                     </h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-lg mb-10 font-medium">
+                    <p className="text-[var(--text-secondary)] text-lg mb-10 font-medium">
                         5 lakh+ jobs for you to explore
                     </p>
 
                     {/* Advanced Search Bar */}
-                    <form onSubmit={handleSearch} className="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-2 rounded-full shadow-2xl flex flex-col md:flex-row items-center gap-2 border border-gray-100 dark:border-gray-700">
-                        <div className="flex-1 flex items-center px-6 gap-3 w-full border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-700">
+                    <form onSubmit={handleSearch} className="max-w-4xl mx-auto bg-[var(--input-bg)] p-2 rounded-full shadow-2xl flex flex-col md:flex-row items-center gap-2 border border-[var(--border-color)]">
+                        <div className="flex-1 flex items-center px-6 gap-3 w-full border-b md:border-b-0 md:border-r border-[var(--border-color)]">
                             <span className="text-xl">🔍</span>
                             <input 
                                 type="text" 
                                 placeholder="Enter skills / designations / companies" 
-                                className="w-full py-4 bg-transparent outline-none font-medium placeholder:text-gray-400"
+                                className="w-full py-4 bg-transparent outline-none font-bold text-[var(--input-text)] placeholder:text-[var(--input-placeholder)]"
                                 value={search.role}
                                 onChange={(e) => setSearch({ ...search, role: e.target.value })}
                             />
@@ -57,7 +61,7 @@ function Home() {
                             <input 
                                 type="text" 
                                 placeholder="Enter location" 
-                                className="w-full py-4 bg-transparent outline-none font-medium placeholder:text-gray-400"
+                                className="w-full py-4 bg-transparent outline-none font-bold text-[var(--input-text)] placeholder:text-[var(--input-placeholder)]"
                                 value={search.location}
                                 onChange={(e) => setSearch({ ...search, location: e.target.value })}
                             />
@@ -72,16 +76,16 @@ function Home() {
             {/* Popular Categories */}
             <section className="max-w-6xl mx-auto px-6 py-20">
                 <div className="flex items-center justify-between mb-10">
-                    <h2 className="text-2xl font-black text-gray-800 dark:text-white">Trending on <span className="text-blue-600">JobPortal</span></h2>
+                    <h2 className="text-2xl font-black text-[var(--text-primary)]">Trending on <span className="text-blue-600">JobPortal</span></h2>
                     <Link to="/find-jobs" className="text-blue-600 font-bold hover:underline">View All ➔</Link>
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {categories.map((cat, idx) => (
-                        <div key={idx} className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:border-blue-200 transition cursor-pointer text-center group">
+                        <div key={idx} className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] hover:shadow-xl hover:border-blue-200 transition cursor-pointer text-center group">
                             <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{cat.icon}</div>
-                            <h3 className="font-bold text-gray-800 dark:text-gray-200 text-sm mb-1">{cat.name}</h3>
-                            <p className="text-xs text-gray-400 font-bold">{cat.count} Jobs</p>
+                            <h3 className="font-bold text-[var(--text-primary)] text-sm mb-1">{cat.name}</h3>
+                            <p className="text-xs text-[var(--text-secondary)] font-bold">{cat.count} Jobs</p>
                         </div>
                     ))}
                 </div>
@@ -98,18 +102,12 @@ function Home() {
                             Try AI Analyzer ✨
                         </Link>
                     </div>
-                    <div className="mt-10 md:mt-0 flex items-center gap-4 relative z-10">
-                        <div className="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/20">
-                            <div className="text-center font-black text-4xl mb-2">98%</div>
-                            <div className="text-[10px] uppercase tracking-widest font-bold">Matching Accuracy</div>
-                        </div>
-                    </div>
                 </div>
             </section>
 
             {/* Featured Companies Section */}
             <section className="max-w-6xl mx-auto px-6 pb-20">
-                <h2 className="text-2xl font-black mb-8 text-gray-800 dark:text-white">Top Companies Hiring</h2>
+                <h2 className="text-2xl font-black mb-8 text-[var(--text-primary)]">Top Companies Hiring</h2>
                 <div className="flex flex-wrap gap-8 items-center justify-center opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" className="h-8" alt="Google" />
                     <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" className="h-8" alt="Microsoft" />
@@ -124,4 +122,5 @@ function Home() {
 }
 
 export default Home;
+
 

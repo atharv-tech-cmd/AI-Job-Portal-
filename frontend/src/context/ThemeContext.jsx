@@ -1,19 +1,25 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-const Ctx = createContext();
+
+const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   
   useEffect(() => {
-    const r = document.documentElement;
-    r.classList.remove('theme-light', 'theme-dark');
-    r.classList.add(theme === 'system'
-      ? (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'theme-dark' : 'theme-light')
-      : `theme-${theme}`);
+    const root = document.documentElement;
+    root.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
   
-  return <Ctx.Provider value={{ theme, setTheme }}>{children}</Ctx.Provider>;
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+  
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
-export const useTheme = () => useContext(Ctx);
+export const useTheme = () => useContext(ThemeContext);
