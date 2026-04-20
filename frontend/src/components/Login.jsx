@@ -4,6 +4,8 @@ import { toast } from 'react-hot-toast';
 import { useNavigate, Link } from 'react-router-dom';
 import { PasswordPanel } from './PasswordPanel';
 
+import { USER_API_END_POINT } from '../utils/constant';
+
 export default function Login() {
     const navigate = useNavigate();
     const [input, setInput] = useState({
@@ -49,7 +51,7 @@ export default function Login() {
 
         setLoading(true);
         try {
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/login", input, {
+            const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
