@@ -17,6 +17,7 @@ import VerifyResetOtp from './components/VerifyResetOtp';
 import VerifyLogin from './components/VerifyLogin';
 import AdminJobs from './components/AdminJobs';
 import Applicants from './components/Applicants';
+import ApplicationStatus from './components/ApplicationStatus';
 
 import Footer from './components/Footer';
 
@@ -46,6 +47,7 @@ function App() {
              <Route path="/admin/jobs" element={<AdminJobs />} />
              <Route path="/admin/jobs/:id/applicants" element={<Applicants />} />
              <Route path="/find-jobs" element={<FindJobs />} />
+             <Route path="/my-applications" element={<ApplicationStatus />} />
              <Route path="/dashboard/recruiter" element={<Home />} />
              <Route path="/dashboard/jobseeker" element={<Home />} />
           </Routes>

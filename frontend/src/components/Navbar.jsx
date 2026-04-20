@@ -45,11 +45,13 @@ function Navbar() {
                 <div className="hidden md:flex items-center gap-10 font-bold text-[13px] text-[var(--text-secondary)]">
                     <Link to="/home" className="hover:text-blue-600 transition tracking-wide uppercase">Home</Link>
                     <Link to="/find-jobs" className="hover:text-blue-600 transition tracking-wide uppercase">Find Jobs</Link>
-                    {user?.role === 'recruiter' && (
+                    {user?.role === 'recruiter' ? (
                         <>
                             <Link to="/post-job" className="hover:text-blue-600 transition tracking-wide uppercase">Post Jobs</Link>
                             <Link to="/admin" className="hover:text-blue-600 transition tracking-wide uppercase">Admin Hub</Link>
                         </>
+                    ) : (
+                        <Link to="/my-applications" className="hover:text-blue-600 transition tracking-wide uppercase">Track Apps</Link>
                     )}
                     <Link to="/ai-analyzer" className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 transition tracking-wide uppercase">
                         <span>AI Specialist</span>
