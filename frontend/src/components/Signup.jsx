@@ -4,6 +4,8 @@ import { toast } from 'react-hot-toast';
 import { useNavigate, Link } from 'react-router-dom';
 import { PasswordPanel, isPasswordStrong } from './PasswordPanel';
 
+import { USER_API_END_POINT } from '../utils/constant';
+
 export default function Signup() {
     const navigate = useNavigate();
     const [input, setInput] = useState({
@@ -40,7 +42,7 @@ export default function Signup() {
         try {
             // Include optional fields appropriately based on backend's expectation or just send them
             const payload = { ...input };
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/register", payload, {
+            const res = await axios.post(`${USER_API_END_POINT}/register`, payload, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
