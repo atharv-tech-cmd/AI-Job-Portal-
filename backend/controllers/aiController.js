@@ -97,7 +97,7 @@ export const analyzeResume = async (req, res) => {
         }
         `;
 
-        const response = await generateWithRetry(ai, ['gemini-1.5-flash'], prompt, pdfBase64, textContent);
+        const response = await generateWithRetry(ai, ['gemini-1.5-flash', 'gemini-pro', 'gemini-1.5-pro'], prompt, pdfBase64, textContent);
         const responseText = response.text();
         const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
         const aiAnalysis = JSON.parse(cleanedText);
@@ -149,7 +149,7 @@ export const generateResume = async (req, res) => {
             textContent = fs.readFileSync(resumePath, 'utf8');
         }
 
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
         const prompt = `
         You are a premium Resume Architect specializing in SDE/FAANG-style professional resumes.
@@ -167,7 +167,7 @@ export const generateResume = async (req, res) => {
         Only the markdown text of the resume. No chat filler. No "Here is the resume".
         `;
 
-        const response = await generateWithRetry(ai, ['gemini-1.5-flash'], prompt, pdfBase64, textContent);
+        const response = await generateWithRetry(ai, ['gemini-1.5-flash', 'gemini-pro', 'gemini-1.5-pro'], prompt, pdfBase64, textContent);
         const generatedMarkdown = response.text().trim();
 
         return res.status(200).json({ 
