@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { USER_API_END_POINT } from '../utils/constant';
 
 function AIAnalyzer() {
     const [loading, setLoading] = useState(false);
@@ -11,7 +9,7 @@ function AIAnalyzer() {
     const analyzeResumeHandler = async () => {
         setLoading(true);
         try {
-            const res = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/user/ai-analyze", {
+            const res = await axios.get(`${USER_API_END_POINT}/ai-analyze`, {
                 withCredentials: true
             });
             if (res.data.success) {
@@ -29,7 +27,7 @@ function AIAnalyzer() {
     const generateResumeHandler = async () => {
         setGeneratingResume(true);
         try {
-            const res = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/user/ai-generate-resume", {
+            const res = await axios.get(`${USER_API_END_POINT}/ai-generate-resume`, {
                 withCredentials: true
             });
             if (res.data.success) {

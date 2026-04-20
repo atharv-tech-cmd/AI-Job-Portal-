@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { JOB_API_END_POINT } from '../utils/constant';
 
 function PostJob() {
     const [input, setInput] = useState({
@@ -21,7 +19,7 @@ function PostJob() {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/job/post", input, {
+            const res = await axios.post(`${JOB_API_END_POINT}/post`, input, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });

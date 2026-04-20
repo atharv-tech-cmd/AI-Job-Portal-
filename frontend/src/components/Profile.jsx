@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { USER_API_END_POINT, APPLICATION_API_END_POINT } from '../utils/constant';
 
 function Profile() {
     const [input, setInput] = useState({
@@ -15,7 +13,7 @@ function Profile() {
     useEffect(() => {
         const fetchAppliedJobs = async () => {
             try {
-                const res = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/application/get", {
+                const res = await axios.get(`${APPLICATION_API_END_POINT}/get`, {
                     withCredentials: true
                 });
                 if (res.data.success) {
@@ -49,7 +47,7 @@ function Profile() {
         }
 
         try {
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/profile/update", formData, {
+            const res = await axios.post(`${USER_API_END_POINT}/profile/update`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
                 withCredentials: true
             });

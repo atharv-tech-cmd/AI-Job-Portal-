@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { JOB_API_END_POINT, APPLICATION_API_END_POINT } from '../utils/constant';
 
 function FindJobs() {
     const [jobs, setJobs] = useState([]);
@@ -17,7 +15,7 @@ function FindJobs() {
                 // Fetch local jobs hosted on our backend
                 let localJobs = [];
                 try {
-                    const localRes = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/job/get");
+                    const localRes = await axios.get(`${JOB_API_END_POINT}/get`);
                     if (localRes.data.success) {
                         localJobs = localRes.data.jobs.map(job => ({
                             id: job._id,
@@ -54,7 +52,7 @@ function FindJobs() {
         if (job.isLocal) {
             e.preventDefault();
             try {
-                const res = await axios.post(`https://ai-job-portal-glq9.onrender.com/api/v1/application/apply/${job.jobId}`, {}, {
+                const res = await axios.post(`${APPLICATION_API_END_POINT}/apply/${job.jobId}`, {}, {
                     withCredentials: true
                 });
                 if (res.data.success) {

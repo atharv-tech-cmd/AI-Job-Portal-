@@ -1,8 +1,4 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
-import ThemeToggle from './ThemeToggle';
+import { USER_API_END_POINT } from '../utils/constant';
 
 function Navbar() {
     const navigate = useNavigate();
@@ -11,7 +7,7 @@ function Navbar() {
 
     const logoutHandler = async () => {
         try {
-            const res = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/user/logout", {
+            const res = await axios.get(`${USER_API_END_POINT}/logout`, {
                 withCredentials: true
             });
             if (res.data.success) {
