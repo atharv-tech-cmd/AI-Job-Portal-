@@ -11,31 +11,21 @@ const generateWithRetry = async (ai, modelList, prompt, pdfBase64, textContent =
 
     // Phase 1: Try the explicitly provided high-performance models
     for (const modelName of modelList) {
-        for (let i = 0; i < 2; i++) {
-            try {
-                console.log(`[AI] Attempting ${modelName}...`);
-                const genModel = ai.getGenerativeModel({ model: `models/${modelName}` }, { apiVersion: 'v1beta' });
-                const contentParts = [prompt];
-                if (pdfBase64) contentParts.push({ inlineData: { data: pdfBase64, mimeType: 'application/pdf' } });
-                if (textContent) contentParts.push(`Text Context: ${textContent}`);
-                
-                const result = await genModel.generateContent(contentParts);
-                const response = await result.response;
-                return response;
-            } catch (error) {
-                lastError = error;
-                console.error(`[AI FAIL] ${modelName}:`, error.message);
-                
-                // If it's a quota/rate limit error, wait longer or skip if it's the last attempt
-                if (error.message?.includes('429') || error.message?.toLowerCase().includes('quota')) {
-                    console.warn(`[AI] Quota hit on ${modelName}. Waiting 3 seconds before retry...`);
-                    await new Promise(r => setTimeout(r, 3000));
-                } else if (error.message?.includes('404')) {
-                    break; // Skip to next model if 404
-                } else {
-                    await new Promise(r => setTimeout(r, 1000));
-                }
-            }
+        try {
+            console.log(`[AI FAST-PATH] Attempting ${modelName}...`);
+            const genModel = ai.getGenerativeModel({ model: `models/${modelName}` }, { apiVersion: 'v1beta' });
+            const contentParts = [prompt];
+            if (pdfBase64) contentParts.push({ inlineData: { data: pdfBase64, mimeType: 'application/pdf' } });
+            if (textContent) contentParts.push(`Text Context: ${textContent}`);
+            
+            const result = await genModel.generateContent(contentParts);
+            const response = await result.response;
+            return response;
+        } catch (error) {
+            lastError = error;
+            console.error(`[AI SKIP] ${modelName} failed or busy.`);
+            // No wait, jump to next model immediately for <5s response
+            if (error.message?.includes('404')) break;
         }
     }
 
@@ -114,7 +104,7 @@ export const analyzeResume = async (req, res) => {
         }
         `;
 
-        const response = await generateWithRetry(ai, ['gemini-2.0-flash', 'gemini-flash-latest', 'gemini-pro-latest'], prompt, pdfBase64, textContent);
+        const response = await generateWithRetry(ai, ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro-latest'], prompt, pdfBase64, textContent);
         const responseText = response.text();
         const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
         const aiAnalysis = JSON.parse(cleanedText);
@@ -201,7 +191,7 @@ export const generateResume = async (req, res) => {
         Only the Markdown content. Do not include any meta-talk or introductory greetings.
         `;
 
-        const response = await generateWithRetry(ai, ['gemini-2.0-flash', 'gemini-flash-latest', 'gemini-pro-latest'], prompt, pdfBase64, textContent);
+        const response = await generateWithRetry(ai, ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-pro-latest'], prompt, pdfBase64, textContent);
         const generatedMarkdown = response.text().trim();
 
         return res.status(200).json({ 
