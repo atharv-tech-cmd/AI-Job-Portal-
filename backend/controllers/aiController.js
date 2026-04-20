@@ -11,7 +11,7 @@ const generateWithRetry = async (ai, modelList, prompt, pdfBase64, textContent =
         for (let i = 0; i < 3; i++) {
             try {
                 console.log(`[AI] Requesting model: ${modelName} (Attempt ${i + 1})`);
-                const genModel = ai.getGenerativeModel({ model: modelName }, { apiVersion: 'v1' });
+                const genModel = ai.getGenerativeModel({ model: `models/${modelName}` }, { apiVersion: 'v1' });
                 
                 let contentParts = [prompt];
                 if (pdfBase64) {
@@ -97,7 +97,7 @@ export const analyzeResume = async (req, res) => {
         }
         `;
 
-        const response = await generateWithRetry(ai, ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'], prompt, pdfBase64, textContent);
+        const response = await generateWithRetry(ai, ['gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro', 'gemini-1.5-pro'], prompt, pdfBase64, textContent);
         const responseText = response.text();
         const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
         const aiAnalysis = JSON.parse(cleanedText);
@@ -167,7 +167,7 @@ export const generateResume = async (req, res) => {
         Only the markdown text of the resume. No chat filler. No "Here is the resume".
         `;
 
-        const response = await generateWithRetry(ai, ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'], prompt, pdfBase64, textContent);
+        const response = await generateWithRetry(ai, ['gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro', 'gemini-1.5-pro'], prompt, pdfBase64, textContent);
         const generatedMarkdown = response.text().trim();
 
         return res.status(200).json({ 
