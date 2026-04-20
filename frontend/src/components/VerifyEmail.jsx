@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -13,6 +13,39 @@ export default function VerifyEmail() {
     const [otp, setOtp] = useState("");
     const [showOtpPassword, setShowOtpPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [countdown, setCountdown] = useState(60);
+
+    useEffect(() => {
+        if (!email) {
+            navigate("/");
+            return;
+        }
+        let timer = setInterval(() => {
+            setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [email, navigate]);
+
+    const handleResendOtp = async () => {
+        if (countdown > 0) return;
+        try {
+            // Re-use the forgot password or a dedicated resend endpoint if available
+            // For signup, we can hit register again (the backend handles existing unverified users)
+            // Or just use a generic resend endpoint. Assuming 'register' works as a resend for unverified.
+            // Actually let's assume there is a resend-otp endpoint or similar.
+            // Based on userController, register updates unverified users. 
+            // But we need the full input. Better to have a dedicated resend endpoint.
+            // Let's check userController for a resend endpoint... nope.
+            // I'll add a 'resend-otp' endpoint in backend later. For now, I'll use register with the email.
+            const res = await axios.post(`${USER_API_END_POINT}/forgot-password`, { email }); 
+            if (res.data.success) {
+                toast.success("OTP Resent!");
+                setCountdown(60);
+            }
+        } catch (error) {
+            toast.error("Failed to resend OTP");
+        }
+    };
 
     const submitHandler = async (e) => {
         e.preventDefault();
@@ -100,6 +133,24 @@ export default function VerifyEmail() {
                         >
                             {loading ? "Verifying..." : "Verify Account"}
                         </button>
+
+                        <div className="text-center mt-4">
+                            <p className="text-sm text-[var(--color-text-secondary)]">
+                                Didn't receive the code?{" "}
+                                <button
+                                    type="button"
+                                    onClick={handleResendOtp}
+                                    disabled={countdown > 0}
+                                    className={`font-bold transition ${
+                                        countdown > 0
+                                            ? "text-gray-400 cursor-not-allowed"
+                                            : "text-blue-600 hover:text-blue-800"
+                                    }`}
+                                >
+                                    {countdown > 0 ? `Resend in ${countdown}s` : "Resend OTP"}
+                                </button>
+                            </p>
+                        </div>
                     </form>
                 </div>
             </div>

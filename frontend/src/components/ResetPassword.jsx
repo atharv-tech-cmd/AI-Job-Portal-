@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PasswordPanel, isPasswordStrong } from './PasswordPanel';
-
 import { USER_API_END_POINT } from '../utils/constant';
 
 export default function ResetPassword() {

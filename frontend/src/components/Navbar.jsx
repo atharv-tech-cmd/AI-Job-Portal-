@@ -1,3 +1,8 @@
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import ThemeToggle from './ThemeToggle';
 import { USER_API_END_POINT } from '../utils/constant';
 
 function Navbar() {
@@ -22,15 +27,15 @@ function Navbar() {
     };
 
     return (
-        <div className="bg-white shadow">
+        <div className="bg-[var(--color-bg)] border-b border-[var(--color-border)] shadow-sm transition-colors">
             <div className="flex items-center justify-between h-16 max-w-7xl mx-auto px-4">
                 <div>
-                    <h1 className="text-2xl font-black tracking-tight">
+                    <h1 className="text-2xl font-black tracking-tight text-[var(--color-text)]">
                         Job<span className="text-blue-600">Portal</span>
                     </h1>
                 </div>
 
-                <div className="flex items-center gap-6 font-semibold text-gray-700">
+                <div className="flex items-center gap-6 font-semibold text-[var(--color-text-secondary)]">
                     {user ? (
                         <>
                             <Link to="/home" className="hover:text-blue-600 transition">Home</Link>

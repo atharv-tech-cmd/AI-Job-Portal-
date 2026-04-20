@@ -14,6 +14,7 @@ import AdminDashboard from './components/AdminDashboard';
 import FindJobs from './components/FindJobs';
 import VerifyEmail from './components/VerifyEmail';
 import VerifyResetOtp from './components/VerifyResetOtp';
+import VerifyLogin from './components/VerifyLogin';
 
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -26,6 +27,7 @@ function App() {
       <Routes>
          <Route path="/" element={<Signup />} />
          <Route path="/login" element={<Login />} />
+         <Route path="/verify-login" element={<VerifyLogin />} />
          <Route path="/verify-email" element={<VerifyEmail />} />
          <Route path="/home" element={<Home />} />
          <Route path="/post-job" element={<PostJob />} />

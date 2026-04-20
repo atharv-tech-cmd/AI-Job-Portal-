@@ -17,9 +17,9 @@ export const register = async (req, res) => {
 
         let user = await User.findOne({ email });
         
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!passwordRegex.test(password)) {
-            return res.status(400).json({ message: "Password must be at least 6 characters long and include an uppercase, lowercase, number, and special character.", success: false });
+            return res.status(400).json({ message: "Password must be at least 8 characters long and include an uppercase, lowercase, number, and special character.", success: false });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -254,9 +254,9 @@ export const resetPassword = async (req, res) => {
             return res.status(400).json({ message: "Invalid or expired OTP", success: false });
         }
 
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!passwordRegex.test(newPassword)) {
-            return res.status(400).json({ message: "Password must be at least 6 characters long and include an uppercase, lowercase, number, and special character.", success: false });
+            return res.status(400).json({ message: "Password must be at least 8 characters long and include an uppercase, lowercase, number, and special character.", success: false });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);

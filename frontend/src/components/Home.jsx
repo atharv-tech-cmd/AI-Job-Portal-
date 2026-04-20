@@ -15,7 +15,7 @@ function Home() {
     }, [navigate]);
 
     return (
-        <main className="min-h-screen bg-[#030305] text-white overflow-hidden font-sans selection:bg-indigo-500/30">
+        <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden font-sans selection:bg-indigo-500/30 transition-colors">
             {/* Animated Background Blobs */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-900/20 blur-[120px] animate-blob"></div>
@@ -38,7 +38,7 @@ function Home() {
                 </div>
                 
                 <h1 className="text-6xl md:text-8xl font-black mt-2 mb-8 tracking-tighter leading-[1.1] animate-fade-in-up animation-delay-100">
-                    <span className="text-white drop-shadow-2xl">Own Your</span> <br className="hidden md:block" />
+                    <span className="text-[var(--color-text)] drop-shadow-2xl">Own Your</span> <br className="hidden md:block" />
                     <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent drop-shadow-lg">
                         Future Career.
                     </span>
@@ -51,10 +51,10 @@ function Home() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up animation-delay-300">
-                    <Link to={user?.role === 'recruiter' ? "/post-job" : "/find-jobs"} className="px-8 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] hover:-translate-y-1">
+                    <Link to={user?.role === 'recruiter' ? "/post-job" : "/find-jobs"} className="px-8 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-[var(--color-text)] font-bold text-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] hover:-translate-y-1">
                         {user?.role === 'recruiter' ? 'Post a New Job' : 'Explore Openings'}
                     </Link>
-                    <Link to="/ai-analyzer" className="px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-lg border border-white/10 transition-all duration-300 backdrop-blur-sm hover:-translate-y-1">
+                    <Link to="/ai-analyzer" className="px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 text-[var(--color-text)] font-bold text-lg border border-white/10 transition-all duration-300 backdrop-blur-sm hover:-translate-y-1">
                         Try AI Analyzer ✨
                     </Link>
                 </div>
@@ -89,11 +89,11 @@ function Home() {
                     <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl mb-8 flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform duration-500">
                         <span className="text-2xl">✨</span>
                     </div>
-                    <h2 className="text-3xl font-extrabold mb-4 text-white group-hover:text-indigo-400 transition-colors">AI Analyzer</h2>
+                    <h2 className="text-3xl font-extrabold mb-4 text-[var(--color-text)] group-hover:text-indigo-400 transition-colors">AI Analyzer</h2>
                     <p className="text-gray-400 text-sm mb-10 leading-relaxed min-h-[60px]">
                         Let our integrated Gemini AI scan your stack, review your resume, and assign you a market match score instantly.
                     </p>
-                    <Link to="/ai-analyzer" className="flex items-center justify-center w-full bg-white text-black px-6 py-4 rounded-xl font-bold hover:bg-indigo-500 hover:text-white transition-all duration-300">
+                    <Link to="/ai-analyzer" className="flex items-center justify-center w-full bg-white text-black px-6 py-4 rounded-xl font-bold hover:bg-indigo-500 hover:text-[var(--color-text)] transition-all duration-300">
                         Launch Analyzer 🚀
                     </Link>
                 </article>
@@ -103,11 +103,11 @@ function Home() {
                     <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl mb-8 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-500">
                         <span className="text-2xl">📝</span>
                     </div>
-                    <h2 className="text-3xl font-extrabold mb-4 text-white group-hover:text-blue-400 transition-colors">My Profile</h2>
+                    <h2 className="text-3xl font-extrabold mb-4 text-[var(--color-text)] group-hover:text-blue-400 transition-colors">My Profile</h2>
                     <p className="text-gray-400 text-sm mb-10 leading-relaxed min-h-[60px]">
                         Keep your professional bio, technical skills, and active Resume (PDF) completely up to date for recruiters.
                     </p>
-                    <Link to="/profile" className="flex items-center justify-center w-full bg-white text-black px-6 py-4 rounded-xl font-bold hover:bg-blue-500 hover:text-white transition-all duration-300">
+                    <Link to="/profile" className="flex items-center justify-center w-full bg-white text-black px-6 py-4 rounded-xl font-bold hover:bg-blue-500 hover:text-[var(--color-text)] transition-all duration-300">
                         Update Repository 📁
                     </Link>
                 </article>
@@ -118,11 +118,11 @@ function Home() {
                         <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl mb-8 flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-500">
                             <span className="text-2xl">💼</span>
                         </div>
-                        <h2 className="text-3xl font-extrabold mb-4 text-white group-hover:text-emerald-400 transition-colors">Post Job</h2>
+                        <h2 className="text-3xl font-extrabold mb-4 text-[var(--color-text)] group-hover:text-emerald-400 transition-colors">Post Job</h2>
                         <p className="text-gray-400 text-sm mb-10 leading-relaxed min-h-[60px]">
                             Have a prestigious tech opening? Drop a live job posting on the platform instantly and source top talent.
                         </p>
-                        <Link to="/post-job" className="flex items-center justify-center w-full bg-white text-black px-6 py-4 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-all duration-300">
+                        <Link to="/post-job" className="flex items-center justify-center w-full bg-white text-black px-6 py-4 rounded-xl font-bold hover:bg-emerald-500 hover:text-[var(--color-text)] transition-all duration-300">
                             Create Posting ✍️
                         </Link>
                     </article>
@@ -131,11 +131,11 @@ function Home() {
                         <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl mb-8 flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-500">
                             <span className="text-2xl">🔍</span>
                         </div>
-                        <h2 className="text-3xl font-extrabold mb-4 text-white group-hover:text-emerald-400 transition-colors">Find Jobs</h2>
+                        <h2 className="text-3xl font-extrabold mb-4 text-[var(--color-text)] group-hover:text-emerald-400 transition-colors">Find Jobs</h2>
                         <p className="text-gray-400 text-sm mb-10 leading-relaxed min-h-[60px]">
                             Browse hundreds of fresh tech roles seamlessly. Filter by stack, experience, and instantly apply.
                         </p>
-                        <Link to="/find-jobs" className="flex items-center justify-center w-full bg-white text-black px-6 py-4 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-all duration-300">
+                        <Link to="/find-jobs" className="flex items-center justify-center w-full bg-white text-black px-6 py-4 rounded-xl font-bold hover:bg-emerald-500 hover:text-[var(--color-text)] transition-all duration-300">
                             Start Searching 🎯
                         </Link>
                     </article>

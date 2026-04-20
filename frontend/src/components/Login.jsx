@@ -57,20 +57,9 @@ export default function Login() {
             });
 
             if (res.data.success) {
-                // Assuming it immediately logs in and returns tokens (unless 2FA is needed, but we handle standard login here)
-                // Assuming verifyOtp or login returns accessToken based on new logic
-                if (res.data.accessToken) {
-                    localStorage.setItem('accessToken', res.data.accessToken);
-                }
-                if (res.data.user) {
-                    localStorage.setItem('user', JSON.stringify(res.data.user));
-                    toast.success(res.data.message || "Logged in successfully!");
-                    // Navigate by role
-                    navigate(res.data.user.role === 'recruiter' ? '/dashboard/recruiter' : '/dashboard/jobseeker', { replace: true });
-                } else if (res.data.requires2FA) {
+                if (res.data.requires2FA) {
                     toast.success(res.data.message);
-                    // Just in case 2FA is still a thing
-                    navigate("/verify-email", { state: { email: input.email } });
+                    navigate("/verify-login", { state: { email: input.email } });
                 }
             }
         } catch (error) {

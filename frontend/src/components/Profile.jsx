@@ -1,6 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import { USER_API_END_POINT, APPLICATION_API_END_POINT } from '../utils/constant';
 
 function Profile() {
+    const navigate = useNavigate();
     const [input, setInput] = useState({
         fullname: "",
         email: "",
@@ -53,6 +55,11 @@ function Profile() {
             });
             if (res.data.success) {
                 toast.success(res.data.message);
+                // Update local storage user if returned
+                if (res.data.user) {
+                    localStorage.setItem('user', JSON.stringify(res.data.user));
+                }
+                navigate("/home");
             }
         } catch (error) {
             console.log(error);

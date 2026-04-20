@@ -29,6 +29,33 @@ export default function Signup() {
     };
 
     const isRecruiter = input.role === 'recruiter';
+
+    const handleGeneratePassword = () => {
+        const length = 12;
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+        let generatedPassword = "";
+        
+        generatedPassword += "A"; 
+        generatedPassword += "B"; 
+        generatedPassword += "a"; 
+        generatedPassword += "b"; 
+        generatedPassword += "1"; 
+        generatedPassword += "!"; 
+        
+        for (let i = 0, n = charset.length; i < length - 6; ++i) {
+            generatedPassword += charset.charAt(Math.floor(Math.random() * n));
+        }
+
+        generatedPassword = generatedPassword.split('').sort(function(){return 0.5-Math.random()}).join('');
+        
+        setInput(prev => ({
+            ...prev,
+            password: generatedPassword,
+            confirmPassword: generatedPassword
+        }));
+
+        toast.success("Strong password generated!", { icon: '🔑' });
+    };
     
     // Validation
     const passwordsMatch = input.password === input.confirmPassword;
@@ -64,7 +91,7 @@ export default function Signup() {
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-50 flex-col md:flex-row">
+        <div className="flex min-h-screen bg-[var(--color-bg)] flex-col md:flex-row transition-colors">
             
             <div className="hidden md:flex md:w-1/2 bg-blue-600 bg-gradient-to-br from-blue-700 to-indigo-900 text-white flex-col justify-center px-12 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&fit=crop')] opacity-10 bg-cover bg-center"></div>
@@ -143,6 +170,9 @@ export default function Signup() {
                         <div>
                             <div className="flex justify-between items-center mb-1.5">
                                 <label className="block text-sm font-bold">Password <span style={{ color: '#ef4444', fontWeight: 600 }}>*</span></label>
+                                <button type="button" onClick={handleGeneratePassword} className="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-md border border-blue-100 hover:bg-blue-100 transition font-bold uppercase transition">
+                                    ✨ Suggest Strong
+                                </button>
                             </div>
                             <div className="relative">
                                 <input type={showPassword ? "text" : "password"} name="password" value={input.password} onChange={changeEventHandler} 

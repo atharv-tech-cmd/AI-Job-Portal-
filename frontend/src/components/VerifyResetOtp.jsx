@@ -1,3 +1,7 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { USER_API_END_POINT } from '../utils/constant';
 
 export default function VerifyResetOtp() {

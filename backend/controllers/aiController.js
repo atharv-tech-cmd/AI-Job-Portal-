@@ -92,7 +92,7 @@ export const analyzeResume = async (req, res) => {
         }
         `;
 
-        const response = await generateWithRetry(ai, ['gemini-2.5-flash'], prompt, pdfBase64);
+        const response = await generateWithRetry(ai, ['gemini-1.5-flash'], prompt, pdfBase64);
 
         const cleanedText = response.text.replace(/```json/g, "").replace(/```/g, "").trim();
         const aiAnalysis = JSON.parse(cleanedText);
@@ -153,7 +153,7 @@ export const generateResume = async (req, res) => {
         Use sections like Contact Info, Summary, Experience, Education, Skills, and Projects.
         `;
 
-        const response = await generateWithRetry(ai, ['gemini-2.5-flash'], prompt, pdfBase64);
+        const response = await generateWithRetry(ai, ['gemini-1.5-flash'], prompt, pdfBase64);
 
         const generatedMarkdown = response.text.trim();
 
