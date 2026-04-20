@@ -4,6 +4,8 @@ import { toast } from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PasswordPanel, isPasswordStrong } from './PasswordPanel';
 
+import { USER_API_END_POINT } from '../utils/constant';
+
 export default function ResetPassword() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -69,7 +71,7 @@ export default function ResetPassword() {
         setLoading(true);
         try {
             // Include otp here since backend usually requires it to finalize reset
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/reset-password", {
+            const res = await axios.post(`${USER_API_END_POINT}/reset-password`, {
                 email,
                 otp,
                 newPassword: input.newPassword
