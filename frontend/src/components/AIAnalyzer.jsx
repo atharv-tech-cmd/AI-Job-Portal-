@@ -22,7 +22,14 @@ function AIAnalyzer() {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response?.data?.message || "Failed to analyze resume");
+            if (error.response?.status === 429) {
+                toast.error("AI Rate Limit: Please wait 60 seconds for the next scan.", {
+                    duration: 6000,
+                    icon: '⏳'
+                });
+            } else {
+                toast.error(error.response?.data?.message || "Failed to analyze resume");
+            }
         } finally {
             setLoading(false);
         }
@@ -40,7 +47,14 @@ function AIAnalyzer() {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response?.data?.message || "Failed to generate resume");
+            if (error.response?.status === 429) {
+                toast.error("Generation Capacity Reached: Wait 60s and try again.", {
+                    duration: 6000,
+                    icon: '⚠️'
+                });
+            } else {
+                toast.error(error.response?.data?.message || "Failed to generate resume");
+            }
         } finally {
             setGeneratingResume(false);
         }

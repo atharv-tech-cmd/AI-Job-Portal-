@@ -25,8 +25,16 @@ const generateWithRetry = async (ai, modelList, prompt, pdfBase64, textContent =
             } catch (error) {
                 lastError = error;
                 console.error(`[AI FAIL] ${modelName}:`, error.message);
-                if (error.message?.includes('404')) break; // Skip to next model if 404
-                await new Promise(r => setTimeout(r, 1000));
+                
+                // If it's a quota/rate limit error, wait longer or skip if it's the last attempt
+                if (error.message?.includes('429') || error.message?.toLowerCase().includes('quota')) {
+                    console.warn(`[AI] Quota hit on ${modelName}. Waiting 5 seconds before retry...`);
+                    await new Promise(r => setTimeout(r, 5000));
+                } else if (error.message?.includes('404')) {
+                    break; // Skip to next model if 404
+                } else {
+                    await new Promise(r => setTimeout(r, 1000));
+                }
             }
         }
     }
@@ -126,7 +134,14 @@ export const analyzeResume = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ message: "AI processing failed: " + (error.message || "Unknown error"), success: false });
+        const errorMessage = error.message || "Unknown error";
+        if (errorMessage.includes('429') || errorMessage.toLowerCase().includes('quota')) {
+            return res.status(429).json({ 
+                message: "AI Capacity Reached: You've hit the Gemini Free Tier limit. Please wait 60 seconds and try again.", 
+                success: false 
+            });
+        }
+        return res.status(500).json({ message: "AI processing failed: " + errorMessage, success: false });
     }
 };
 
@@ -196,6 +211,13 @@ export const generateResume = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ message: "AI processing failed: " + (error.message || "Unknown error"), success: false });
+        const errorMessage = error.message || "Unknown error";
+        if (errorMessage.includes('429') || errorMessage.toLowerCase().includes('quota')) {
+            return res.status(429).json({ 
+                message: "AI Capacity Reached: You've hit the Gemini Free Tier limit. Please wait 60 seconds and try again.", 
+                success: false 
+            });
+        }
+        return res.status(500).json({ message: "AI processing failed: " + errorMessage, success: false });
     }
 };
