@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import ThemeToggle from './ThemeToggle';
 
 function Navbar() {
     const navigate = useNavigate();
@@ -45,6 +46,7 @@ function Navbar() {
                             <Link to="/admin" className="hover:text-red-600 text-red-700 transition tracking-wide text-sm bg-red-100 px-3 py-1 rounded-full uppercase">Admin 👑</Link>
                             
                             <div className="flex items-center gap-3 ml-4">
+                                <ThemeToggle />
                                 <button onClick={logoutHandler} className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition hover:shadow-lg font-bold">
                                     Logout
                                 </button>
@@ -52,6 +54,7 @@ function Navbar() {
                         </>
                     ) : (
                         <div className="flex items-center gap-3 ml-4">
+                            <ThemeToggle />
                             <Link to="/login" className="px-5 py-2 border-2 border-gray-200 rounded-lg hover:bg-gray-100 transition">
                                 Login
                             </Link>

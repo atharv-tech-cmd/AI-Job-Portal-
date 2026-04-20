@@ -2,14 +2,17 @@ import { User } from "../models/userModel.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
-
+import { isEmailDomainValid } from "../utils/validateEmail.js";
 export const register = async (req, res) => {
     try {
         const { fullname, email, password, role } = req.body;
         
         if (!fullname || !email || !password || !role) {
             return res.status(400).json({ message: "Something is missing", success: false });
+        }
+
+        if (!(await isEmailDomainValid(email))) {
+            return res.status(400).json({ message: 'This email does not appear to be valid. Please use a real email address.', success: false });
         }
 
         const userExists = await User.findOne({ email });
@@ -183,15 +186,26 @@ export const forgotPassword = async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
         if (!user) {
-            return res.status(404).json({ message: "User not found", success: false });
+            return res.status(404).json({ message: 'No account found with this email address.', success: false });
+        }
+
+        // Fix: Don't create new token if valid one exists
+        if (user.resetPasswordOTP && user.resetPasswordExpires && user.resetPasswordExpires > Date.now()) {
+            const message = `Your Password Reset OTP is ${user.resetPasswordOTP}.`;
+            await sendEmail({
+                email: user.email,
+                subject: "Job Portal Password Reset OTP",
+                message,
+            });
+            return res.status(200).json({ message: `OTP sent to ${user.email}`, success: true });
         }
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         
         user.resetPasswordOTP = otp;
-        user.resetPasswordExpires = Date.now() + 60 * 1000;
+        user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
         await user.save();
-        const message = `Your Password Reset OTP is ${otp}. It is valid for 60 seconds.`;
+        const message = `Your Password Reset OTP is ${otp}. It is valid for 10 minutes.`;
 
         try {
             await sendEmail({
@@ -268,7 +282,18 @@ export const verifyEmail = async (req, res) => {
         user.verificationOTPExpires = undefined;
         await user.save();
 
-        return res.status(200).json({ message: "Email verified successfully. You can now login.", success: true });
+        const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
+
+        return res.status(200).cookie("token", accessToken, {
+            maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
+            httpOnly: true,
+            sameSite: 'strict'
+        }).json({
+            message: "Email verified successfully.",
+            user: { id: user._id, name: user.fullname, email: user.email, role: user.role },
+            accessToken,
+            success: true
+        });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server error", success: false });

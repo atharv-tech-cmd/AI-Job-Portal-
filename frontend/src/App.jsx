@@ -13,10 +13,14 @@ import AIAnalyzer from './components/AIAnalyzer';
 import AdminDashboard from './components/AdminDashboard';
 import FindJobs from './components/FindJobs';
 import VerifyEmail from './components/VerifyEmail';
+import VerifyResetOtp from './components/VerifyResetOtp';
+
+import { ThemeProvider } from './context/ThemeContext';
 
 function App() {
   return (
-    <BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
       <Toaster />  
       <Navbar />
       <Routes>
@@ -27,12 +31,16 @@ function App() {
          <Route path="/post-job" element={<PostJob />} />
          <Route path="/profile" element={<Profile />} />
          <Route path="/forgot-password" element={<ForgotPassword />} />
+         <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
          <Route path="/reset-password" element={<ResetPassword />} />
          <Route path="/ai-analyzer" element={<AIAnalyzer />} />
          <Route path="/admin" element={<AdminDashboard />} />
          <Route path="/find-jobs" element={<FindJobs />} />
-       </Routes>
+         <Route path="/dashboard/recruiter" element={<Home />} />
+         <Route path="/dashboard/jobseeker" element={<Home />} />
+      </Routes>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

@@ -40,3 +40,51 @@
   66% { transform: translate(-40px, 40px) scale(0.9); }
   100% { transform: translate(0px, 0px) scale(1); }
 }
+
+/* Hide browser built-in eye icons on password fields */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input::-ms-reveal { display: none !important; }
+
+/* Light theme */
+:root, .theme-light {
+  --bg: #ffffff;
+  --bg-2: #f9fafb;
+  --bg-input: #f3f4f6;
+  --text: #111827;
+  --text-2: #6b7280;
+  --border: #e5e7eb;
+  --card: #ffffff;
+
+  /* Aliases for components */
+  --color-bg: var(--bg);
+  --color-bg-secondary: var(--bg-2);
+  --color-bg-input: var(--bg-input);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-2);
+  --color-border: var(--border);
+  --color-card: var(--card);
+}
+
+/* Dark theme */
+.theme-dark {
+  --bg: #0f172a;
+  --bg-2: #1e293b;
+  --bg-input: #1e293b;
+  --text: #f1f5f9;
+  --text-2: #94a3b8;
+  --border: #334155;
+  --card: #1e293b;
+
+  /* Aliases for components */
+  --color-bg: var(--bg);
+  --color-bg-secondary: var(--bg-2);
+  --color-bg-input: var(--bg-input);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-2);
+  --color-border: var(--border);
+  --color-card: var(--card);
+}
+
+body { background-color: var(--bg); color: var(--text); transition: background 0.2s, color 0.2s; }
+
