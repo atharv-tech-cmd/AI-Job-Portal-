@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { USER_API_END_POINT } from '../utils/constant';
 
 export default function VerifyResetOtp() {
     const navigate = useNavigate();
@@ -28,32 +25,17 @@ export default function VerifyResetOtp() {
 
         setLoading(true);
         try {
-            // Note: Verify Reset OTP. We pass the email and OTP so backend can validate.
-            // On full project, you need a specific endpoint to verify reset OTP.
-            // But if they reuse exactly "verify-email", let's use that or pass it directly to reset-password later.
-            // Or assume backend has /user/verify-reset-otp. Since it wasn't specified, let's assume /user/verify-reset-otp is valid
-            // wait, previously reset-password route verified the OTP AND did the password change in one go.
-            // To stick with standard, I'll pass the email and OTP to the next route as state. That way ResetPassword can submit them both unless there's a verify step.
-            // "Step 2: ... on success navigate to /reset-password"
-            // Let's assume there's a verification endpoint. Or we can just navigate to Reset and pass OTP.
-            // Actually, if we just verify the OTP formatting here and pass it, that works. But prompt says "on success navigate", meaning we hit an API.
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/verify-reset-otp", { email, otp }, {
+            const res = await axios.post(`${USER_API_END_POINT}/verify-reset-otp`, { email, otp }, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
             if (res.data.success) {
                 toast.success(res.data.message || "OTP Verified");
-                navigate('/reset-password', { state: { email, otp } }); // also pass OTP as token
+                navigate('/reset-password', { state: { email, otp } }); 
             }
         } catch (error) {
-            // Fallback if the endpoint doesn't exist, just pass it forward to ResetPassword!
-            // The prompt says "Step 2: 6-box OTP input + 60s resend countdown -> on success navigate to /reset-password"
-            // So if `verify-reset-otp` API endpoint doesn't exist, we can just navigate straight, but let's assume it does.
-            // Wait, previous ResetPassword took `otp` and `newPassword`. So the backend reset-password endpoint takes both!
-            // This means Step 2 doesn't technically NEED a backend check, but usually does.
-            // We will just navigate to step 3 on submit since reset-password takes {otp, newPassword}.
-            console.log("No explicit verify endpoint discovered, navigating to reset password directly with OTP state");
-            navigate('/reset-password', { state: { email, otp } });
+            console.log("OTP verification error:", error);
+            toast.error(error.response?.data?.message || "Invalid OTP or something went wrong");
         } finally {
             setLoading(false);
         }
@@ -62,7 +44,7 @@ export default function VerifyResetOtp() {
     const handleResend = async () => {
         if (countdown > 0) return;
         try {
-            await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/forgot-password", { email }, {
+            await axios.post(`${USER_API_END_POINT}/forgot-password`, { email }, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
