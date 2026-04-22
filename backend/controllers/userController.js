@@ -2,8 +2,7 @@ import { User } from "../models/userModel.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
-
+import { isEmailDomainValid } from "../utils/validateEmail.js";
 export const register = async (req, res) => {
     try {
         const { fullname, email, password, role } = req.body;
@@ -12,42 +11,59 @@ export const register = async (req, res) => {
             return res.status(400).json({ message: "Something is missing", success: false });
         }
 
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: "User already exists with this email.", success: false });
+        if (!(await isEmailDomainValid(email))) {
+            return res.status(400).json({ message: 'This email does not appear to be valid. Please use a real email address.', success: false });
         }
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+
+        let user = await User.findOne({ email });
+        
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!passwordRegex.test(password)) {
-            return res.status(400).json({ message: "Password must be at least 6 characters long and include an uppercase, lowercase, number, and special character.", success: false });
+            return res.status(400).json({ message: "Password must be at least 8 characters long and include an uppercase, lowercase, number, and special character.", success: false });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const otpExpires = Date.now() + 60 * 1000;
+        const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-        const newUser = await User.create({
-            fullname,
-            email,
-            password: hashedPassword,
-            role,
-            verificationOTP: otp,
-            verificationOTPExpires: otpExpires,
-            isVerified: false
-        });
-        const message = `Welcome to the Job Portal! Your Email Verification OTP is ${otp}. It is valid for 60 seconds.`;
+        if (user) {
+            if (user.isVerified) {
+                return res.status(400).json({ message: "User already exists with this email.", success: false });
+            } else {
+                // Update existing unverified user
+                user.fullname = fullname;
+                user.password = hashedPassword;
+                user.role = role;
+                user.verificationOTP = otp;
+                user.verificationOTPExpires = otpExpires;
+                await user.save();
+            }
+        } else {
+            // Create new user
+            user = await User.create({
+                fullname,
+                email,
+                password: hashedPassword,
+                role,
+                verificationOTP: otp,
+                verificationOTPExpires: otpExpires,
+                isVerified: false
+            });
+        }
+
+        const message = `Welcome to the Job Portal! Your Email Verification OTP is ${otp}. It is valid for 10 minutes.`;
 
         try {
             await sendEmail({
-                email: newUser.email,
+                email: user.email,
                 subject: "Job Portal Email Verification OTP",
                 message,
             });
+            return res.status(201).json({ message: "Account created successfully. Please check your email for the verification OTP.", success: true });
         } catch (emailError) {
             console.log("Email sending failed:", emailError);
-            // We can still proceed but user won't get email. Ideally, they can request a new OTP later.
+            return res.status(500).json({ message: "Failed to send verification email. Please try again or check your email settings.", success: false });
         }
-
-        return res.status(201).json({ message: "Account created successfully. Please check your email for the verification OTP.", success: true });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server error", success: false });
@@ -83,10 +99,10 @@ export const login = async (req, res) => {
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         user.verificationOTP = otp;
-        user.verificationOTPExpires = Date.now() + 60 * 1000;
+        user.verificationOTPExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
         await user.save();
 
-        const message = `Your Login Verification OTP is ${otp}. It is valid for 60 seconds.`;
+        const message = `Your Login Verification OTP is ${otp}. It is valid for 10 minutes.`;
 
         try {
             await sendEmail({
@@ -183,15 +199,26 @@ export const forgotPassword = async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
         if (!user) {
-            return res.status(404).json({ message: "User not found", success: false });
+            return res.status(404).json({ message: 'No account found with this email address.', success: false });
+        }
+
+        // Fix: Don't create new token if valid one exists
+        if (user.resetPasswordOTP && user.resetPasswordExpires && user.resetPasswordExpires > Date.now()) {
+            const message = `Your Password Reset OTP is ${user.resetPasswordOTP}.`;
+            await sendEmail({
+                email: user.email,
+                subject: "Job Portal Password Reset OTP",
+                message,
+            });
+            return res.status(200).json({ message: `OTP sent to ${user.email}`, success: true });
         }
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         
         user.resetPasswordOTP = otp;
-        user.resetPasswordExpires = Date.now() + 60 * 1000;
+        user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
         await user.save();
-        const message = `Your Password Reset OTP is ${otp}. It is valid for 60 seconds.`;
+        const message = `Your Password Reset OTP is ${otp}. It is valid for 10 minutes.`;
 
         try {
             await sendEmail({
@@ -227,9 +254,9 @@ export const resetPassword = async (req, res) => {
             return res.status(400).json({ message: "Invalid or expired OTP", success: false });
         }
 
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!passwordRegex.test(newPassword)) {
-            return res.status(400).json({ message: "Password must be at least 6 characters long and include an uppercase, lowercase, number, and special character.", success: false });
+            return res.status(400).json({ message: "Password must be at least 8 characters long and include an uppercase, lowercase, number, and special character.", success: false });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -238,7 +265,27 @@ export const resetPassword = async (req, res) => {
         user.resetPasswordExpires = undefined;
         await user.save();
 
-        res.status(200).json({ message: "Password reset completely successful", success: true });
+        res.status(200).json({ message: "Password reset successful", success: true });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Server error", success: false });
+    }
+};
+
+export const verifyResetOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const user = await User.findOne({
+            email,
+            resetPasswordOTP: otp,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid or expired OTP", success: false });
+        }
+
+        return res.status(200).json({ message: "OTP verified correctly", success: true });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server error", success: false });
@@ -268,7 +315,18 @@ export const verifyEmail = async (req, res) => {
         user.verificationOTPExpires = undefined;
         await user.save();
 
-        return res.status(200).json({ message: "Email verified successfully. You can now login.", success: true });
+        const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
+
+        return res.status(200).cookie("token", accessToken, {
+            maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
+            httpOnly: true,
+            sameSite: 'strict'
+        }).json({
+            message: "Email verified successfully.",
+            user: { id: user._id, name: user.fullname, email: user.email, role: user.role },
+            accessToken,
+            success: true
+        });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Server error", success: false });
@@ -301,7 +359,8 @@ export const verifyLoginOTP = async (req, res) => {
 
         return res.status(200).cookie("token", token, {
             maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
-            httpsOnly: true,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
         }).json({
             message: `Welcome back ${user.fullname}!`,

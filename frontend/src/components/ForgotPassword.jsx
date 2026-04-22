@@ -1,47 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
-function ForgotPassword() {
+import { USER_API_END_POINT } from '../utils/constant';
+
+export default function ForgotPassword() {
     const [email, setEmail] = useState("");
     const navigate = useNavigate();
+    const isSubmitting = useRef(false);
 
-    const submitHandler = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (isSubmitting.current) return;
+        isSubmitting.current = true;
         try {
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/forgot-password", { email }, {
+            const res = await axios.post(`${USER_API_END_POINT}/forgot-password`, { email }, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
             if (res.data.success) {
                 toast.success(res.data.message);
-                navigate("/reset-password");
+                navigate('/verify-reset-otp', { state: { email } });
             }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.response?.data?.message || "Failed to send OTP");
+        } catch (err) {
+            console.log(err);
+            toast.error(err.response?.data?.message || "Failed to send OTP");
+            isSubmitting.current = false;
         }
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-            <form onSubmit={submitHandler} className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h1 className="font-bold text-2xl mb-6 text-center text-blue-600">Forgot Password</h1>
+        <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] transition-colors duration-200 p-4">
+            <form onSubmit={handleSubmit} className="bg-[var(--color-card)] border border-[var(--color-border)] p-8 rounded-2xl shadow-xl w-full max-w-md">
+                <div className="text-center mb-6">
+                    <h1 className="font-bold text-3xl mb-2 text-blue-600">Forgot Password</h1>
+                    <p className="text-[var(--color-text-secondary)] text-sm">We'll send a verification code to your email</p>
+                </div>
                 
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">Enter your Account Email</label>
+                <div className="mb-6">
+                    <label className="block text-[var(--color-text-secondary)] font-medium mb-2 text-sm">Enter your Account Email</label>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} 
-                           className="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-blue-500" 
+                           className="w-full bg-[var(--color-bg-input)] border border-[var(--color-border)] text-[var(--color-text)] rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition" 
                            placeholder="account@gmail.com" required />
                 </div>
                 
-                <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition">
+                <button type="submit" className="w-full bg-blue-600 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-blue-500 shadow-md transition">
                     Send OTP to Email
                 </button>
             </form>
         </div>
     );
 }
-
-export default ForgotPassword;

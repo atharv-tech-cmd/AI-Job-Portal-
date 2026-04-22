@@ -40,3 +40,74 @@
   66% { transform: translate(-40px, 40px) scale(0.9); }
   100% { transform: translate(0px, 0px) scale(1); }
 }
+
+/* Hide browser built-in eye icons on password fields */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input::-ms-reveal { display: none !important; }
+
+/* Theme Variables System */
+:root {
+  /* Light Theme (Default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9ff;
+  --text-primary: #111111;
+  --text-secondary: #555555;
+  --border-color: #e5e7eb;
+  --input-bg: #ffffff;
+  --input-text: #111111;
+  --input-placeholder: rgba(0, 0, 0, 0.4);
+  --accent-color: #2563eb;
+  --card-bg: #ffffff;
+
+  /* Legacy Mapping for backward compatibility */
+  --color-bg: var(--bg-primary);
+  --color-text: var(--text-primary);
+  --color-border: var(--border-color);
+  --color-text-secondary: var(--text-secondary);
+  --color-bg-input: var(--input-bg);
+  --color-card: var(--card-bg);
+}
+
+[data-theme="dark"] {
+  /* Dark Theme */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #121212;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --border-color: #2a2a2a;
+  --input-bg: #1a1a1a;
+  --input-text: #f0f0f0;
+  --input-placeholder: rgba(255, 255, 255, 0.5);
+  --accent-color: #3b82f6;
+  --card-bg: #111111;
+
+  /* Legacy Mapping for backward compatibility */
+  --color-bg: var(--bg-primary);
+  --color-text: var(--text-primary);
+  --color-border: var(--border-color);
+  --color-text-secondary: var(--text-secondary);
+  --color-bg-input: var(--input-bg);
+  --color-card: var(--card-bg);
+}
+
+/* Global Styles */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Specific component overrides for total visibility */
+input, textarea, select {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--input-placeholder) !important;
+}
+

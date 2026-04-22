@@ -1,82 +1,142 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { PasswordPanel, isPasswordStrong } from './PasswordPanel';
+import { USER_API_END_POINT } from '../utils/constant';
 
-function ResetPassword() {
+export default function ResetPassword() {
     const navigate = useNavigate();
+    const location = useLocation();
+    
+    // We expect email and otp to be passed from the VerifyResetOtp step
+    const email = location.state?.email || "";
+    const otp = location.state?.otp || "";
+
     const [input, setInput] = useState({
-        otp: "",
-        newPassword: ""
+        newPassword: "",
+        confirmPassword: ""
     });
-    const [showOtp, setShowOtp] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
     };
 
+    const handleGeneratePassword = () => {
+        const length = 12;
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+        let generatedPassword = "";
+        
+        // Ensure at least 1 of each required character type
+        generatedPassword += "A"; // Uppercase
+        generatedPassword += "B"; // Uppercase
+        generatedPassword += "a"; // Lowercase
+        generatedPassword += "b"; // Lowercase
+        generatedPassword += "1"; // Number
+        generatedPassword += "!"; // Special
+        
+        for (let i = 0, n = charset.length; i < length - 6; ++i) {
+            generatedPassword += charset.charAt(Math.floor(Math.random() * n));
+        }
+
+        // Shuffle
+        generatedPassword = generatedPassword.split('').sort(function(){return 0.5-Math.random()}).join('');
+        
+        setInput(prev => ({
+            ...prev,
+            newPassword: generatedPassword,
+            confirmPassword: generatedPassword
+        }));
+
+        toast.success("Strong password generated and applied!", { icon: '🔑' });
+    };
+
+    const isMatch = input.newPassword === input.confirmPassword;
+    const isStrong = isPasswordStrong(input.newPassword);
+    const canSubmit = isStrong && isMatch;
+
     const submitHandler = async (e) => {
         e.preventDefault();
+        
+        // If email or otp missing, it will likely fail on backend. 
+        if (!email || !otp) {
+            toast.error("Missing email or OTP verification verification data.");
+            return;
+        }
+
+        setLoading(true);
         try {
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/user/reset-password", input, {
+            // Include otp here since backend usually requires it to finalize reset
+            const res = await axios.post(`${USER_API_END_POINT}/reset-password`, {
+                email,
+                otp,
+                newPassword: input.newPassword
+            }, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
 
             if (res.data.success) {
-                toast.success(res.data.message);
+                toast.success("Password reset! Please log in.");
                 navigate("/login");
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response?.data?.message || "Invalid OTP or Error");
+            toast.error(error.response?.data?.message || "Error resetting password");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-            <form onSubmit={submitHandler} className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                <h1 className="font-bold text-2xl mb-6 text-center text-green-600">Reset Password</h1>
+        <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] transition-colors duration-200 p-4">
+            <form onSubmit={submitHandler} className="bg-[var(--color-card)] border border-[var(--color-border)] p-8 rounded-2xl shadow-xl w-full max-w-md">
+                <div className="text-center mb-6">
+                    <h1 className="font-bold text-3xl mb-2 text-green-600">New Password</h1>
+                    <p className="text-[var(--color-text-secondary)] text-sm">Create a new secure password</p>
+                </div>
                 
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">Enter 6-digit OTP</label>
-                    <div className="relative">
-                        <input type={showOtp ? "text" : "password"} name="otp" value={input.otp} onChange={changeEventHandler} 
-                               className="w-full border border-gray-300 rounded px-3 py-2 pr-10 outline-none focus:border-green-500" 
-                               placeholder="123456" maxLength="6" required />
-                        <button type="button" onClick={() => setShowOtp(!showOtp)} className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
-                            {showOtp ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.579 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-                            )}
-                        </button>
-                    </div>
+                <div className="flex justify-end mb-4">
+                    <button type="button" onClick={handleGeneratePassword} className="text-sm font-semibold text-blue-600 hover:text-blue-500 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 transition flex items-center gap-1.5">
+                        ✨ Generate Secure Password
+                    </button>
                 </div>
                 
                 <div className="mb-4">
-                    <label className="block text-gray-700 font-medium mb-2">New Password (Min 6 chars, uppercase, lowercase, num, special)</label>
+                    <label className="block text-[var(--color-text-secondary)] font-medium mb-2 text-sm">New Password</label>
                     <div className="relative">
                         <input type={showPassword ? "text" : "password"} name="newPassword" value={input.newPassword} onChange={changeEventHandler} 
-                               className="w-full border border-gray-300 rounded px-3 py-2 pr-10 outline-none focus:border-green-500" 
+                               className="w-full bg-[var(--color-bg-input)] border border-[var(--color-border)] text-[var(--color-text)] rounded-xl px-4 py-3 pr-10 outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition" 
                                placeholder="Enter new strong password" required />
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700">
-                            {showPassword ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.579 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-                            )}
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-3 flex items-center text-[var(--color-text-secondary)] hover:text-gray-400">
+                            👁️
                         </button>
                     </div>
                 </div>
                 
-                <button type="submit" className="w-full bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 transition">
-                    Set New Password
+                <div className="mb-6">
+                    <PasswordPanel password={input.newPassword} />
+                </div>
+                
+                <div className="mb-6">
+                    <label className="block text-[var(--color-text-secondary)] font-medium mb-2 text-sm">Confirm Password</label>
+                    <div className="relative">
+                        <input type={showConfirm ? "text" : "password"} name="confirmPassword" value={input.confirmPassword} onChange={changeEventHandler} 
+                               className="w-full bg-[var(--color-bg-input)] border border-[var(--color-border)] text-[var(--color-text)] rounded-xl px-4 py-3 pr-10 outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition" 
+                               placeholder="Confirm new password" required />
+                        <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute inset-y-0 right-3 flex items-center text-[var(--color-text-secondary)] hover:text-gray-400">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" disabled={!canSubmit || loading} className="w-full bg-green-600 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)] transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    {loading ? "Resetting..." : "Set New Password"}
                 </button>
             </form>
         </div>
     );
 }
-
-export default ResetPassword;

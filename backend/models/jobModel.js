@@ -9,6 +9,7 @@ const jobSchema = new mongoose.Schema({
     jobType: { type: String, required: true },
     experienceLevel: { type: Number, required: true },
     companyName: { type: String, required: true },
+    externalUrl: { type: String },
     created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Application' }]
 }, {timestamps: true});

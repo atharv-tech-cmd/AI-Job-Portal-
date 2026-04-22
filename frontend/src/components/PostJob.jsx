@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { JOB_API_END_POINT } from '../utils/constant';
 
 function PostJob() {
     const [input, setInput] = useState({
@@ -11,7 +12,8 @@ function PostJob() {
         location: "",
         jobType: "",
         experienceLevel: "",
-        companyName: ""
+        companyName: "",
+        externalUrl: ""
     });
 
     const changeEventHandler = (e) => {
@@ -21,7 +23,7 @@ function PostJob() {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("https://ai-job-portal-glq9.onrender.com/api/v1/job/post", input, {
+            const res = await axios.post(`${JOB_API_END_POINT}/post`, input, {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true
             });
@@ -78,9 +80,14 @@ function PostJob() {
                     <label className="block text-gray-700 font-medium mb-1">Experience Level (in years)</label>
                     <input type="number" name="experienceLevel" value={input.experienceLevel} onChange={changeEventHandler} className="w-full border p-2 rounded focus:outline-blue-500" required />
                 </div>
+
+                <div className="col-span-2">
+                    <label className="block text-gray-700 font-medium mb-1">External Job URL (Optional)</label>
+                    <input type="url" name="externalUrl" value={input.externalUrl} onChange={changeEventHandler} className="w-full border p-2 rounded focus:outline-blue-500" placeholder="https://company.com/careers/job-123" />
+                </div>
                 
-                <button type="submit" className="col-span-2 mt-4 w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">
-                    Post Job
+                <button type="submit" className="col-span-2 mt-4 w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
+                    Publish Tech Job 🚀
                 </button>
             </form>
         </div>

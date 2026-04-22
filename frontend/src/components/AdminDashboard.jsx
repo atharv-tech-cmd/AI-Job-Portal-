@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { USER_API_END_POINT } from '../utils/constant';
 
 function AdminDashboard() {
     const [stats, setStats] = useState(null);
@@ -8,7 +9,7 @@ function AdminDashboard() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await axios.get("https://ai-job-portal-glq9.onrender.com/api/v1/user/admin/stats", {
+                const res = await axios.get(`${USER_API_END_POINT}/admin/stats`, {
                     withCredentials: true
                 });
                 if (res.data.success) {

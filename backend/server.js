@@ -9,10 +9,12 @@ import userRoutes from "./routes/userRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
 
+import path from "path";
 dotenv.config();
 
 const app = express();
 
+app.use("/uploads", express.static(path.resolve("uploads")));
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());

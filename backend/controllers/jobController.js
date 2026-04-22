@@ -2,7 +2,7 @@ import { Job } from "../models/jobModel.js";
 
 export const postJob = async (req, res) => {
     try {
-        const { title, description, requirements, salary, location, jobType, experienceLevel, companyName } = req.body;
+        const { title, description, requirements, salary, location, jobType, experienceLevel, companyName, externalUrl } = req.body;
         const userId = req.id;
 
         if (!title || !description || !requirements || !salary || !location || !jobType || !experienceLevel || !companyName) {
@@ -18,6 +18,7 @@ export const postJob = async (req, res) => {
             jobType,
             experienceLevel,
             companyName,
+            externalUrl,
             created_by: userId
         });
 
